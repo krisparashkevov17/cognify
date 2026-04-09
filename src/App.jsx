@@ -398,7 +398,7 @@ function Spinner() {
 // ─── MAIN APP ────────────────────────────────────────────────────────────
 
 export default function App() {
-  const [view, setView] = useState('analyze');
+  const [view, setView] = useState('home');
   const [conversation, setConversation] = useState('');
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -494,9 +494,13 @@ export default function App() {
   const profile = aggregateProfile(sessions);
   const fingerprint = generateFingerprint(profile);
 
+  const handleDemoFromHome = useCallback(async () => {
+    setView('analyze');
+    setTimeout(() => handleDemo(), 50);
+  }, [handleDemo]);
+
   return (
     <div className="min-h-screen bg-gray-950 text-gray-100">
-      {/* Storage warning */}
       {storageWarn && (
         <div className="bg-yellow-500/10 border-b border-yellow-500/20 px-4 py-2 text-xs text-yellow-400 text-center">
           Storage unavailable — session data is in-memory only and will not persist across reloads.
@@ -504,8 +508,8 @@ export default function App() {
       )}
 
       {/* Header */}
-      <header className="border-b border-gray-800 px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
+      <header className="border-b border-gray-800 px-6 py-4 flex items-center justify-between sticky top-0 bg-gray-950/90 backdrop-blur-sm z-50">
+        <button onClick={() => setView('home')} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
           <div className="w-7 h-7 rounded-md bg-indigo-600 flex items-center justify-center">
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
               <circle cx="7" cy="7" r="2.5" fill="white" />
@@ -513,10 +517,7 @@ export default function App() {
             </svg>
           </div>
           <span className="font-semibold text-white tracking-tight">Cognify</span>
-          <span className="text-xs text-gray-600 font-mono border border-gray-800 rounded px-1.5 py-0.5">
-            mock mode
-          </span>
-        </div>
+        </button>
 
         <nav className="flex items-center gap-1">
           {['analyze', 'profile'].map(v => (
@@ -534,6 +535,130 @@ export default function App() {
       </header>
 
       <main className="max-w-4xl mx-auto px-4 py-8">
+
+        {/* ── HOME VIEW ───────────────────────────────────────────── */}
+        {view === 'home' && (
+          <div>
+            {/* Hero */}
+            <div className="text-center pt-16 pb-20 relative">
+              <div className="absolute inset-0 -z-10 pointer-events-none"
+                style={{ background: 'radial-gradient(ellipse 60% 40% at 50% 0%, rgba(99,102,241,0.15) 0%, transparent 70%)' }} />
+              <div className="inline-flex items-center gap-2 border border-indigo-500/30 bg-indigo-500/10 rounded-full px-4 py-1.5 text-xs text-indigo-400 font-mono mb-8">
+                cognitive fitness tracker
+              </div>
+              <h1 className="text-5xl sm:text-6xl font-black text-white leading-tight tracking-tight mb-6">
+                Know how well<br />
+                <span className="text-indigo-400">you think.</span>
+              </h1>
+              <p className="text-xl text-gray-400 max-w-xl mx-auto leading-relaxed mb-10">
+                We built tools to track our steps. We built tools to track our sleep.<br />
+                <strong className="text-gray-200">Nobody built a tool to track cognitive fitness.</strong>
+              </p>
+              <div className="flex items-center justify-center gap-4 flex-wrap">
+                <button
+                  onClick={handleDemoFromHome}
+                  className="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-8 py-3 rounded-xl text-sm transition-colors">
+                  Try Demo
+                </button>
+                <button
+                  onClick={() => setView('analyze')}
+                  className="border border-gray-700 hover:border-gray-500 text-gray-300 hover:text-white px-8 py-3 rounded-xl text-sm transition-colors">
+                  Analyze a Conversation
+                </button>
+              </div>
+            </div>
+
+            {/* What we measure */}
+            <div className="mb-16">
+              <p className="text-xs text-gray-600 uppercase tracking-widest font-mono text-center mb-8">What Cognify measures</p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {[
+                  { score: 69, label: 'Critical Thinking', color: '#6366f1', ringColor: '#6366f1', desc: 'How much you challenge and evaluate claims rather than accepting them at face value.' },
+                  { score: 73, label: 'Depth', color: '#10b981', ringColor: '#10b981', desc: 'How substantively you explore topics — follow-up questions, nuance-seeking, mechanism-probing.' },
+                  { score: 85, label: 'Engagement', color: '#f59e0b', ringColor: '#f59e0b', desc: 'How actively you participate — response quality, contribution, topic coverage.' },
+                ].map(({ score, label, color, ringColor, desc }) => {
+                  const r = 36, circ = 2 * Math.PI * r, filled = circ * (score / 100);
+                  return (
+                    <div key={label} className="bg-gray-900 border border-gray-800 rounded-2xl p-6 text-center">
+                      <div className="relative w-24 h-24 mx-auto flex items-center justify-center mb-4">
+                        <svg width="96" height="96" className="absolute inset-0" style={{ transform: 'rotate(-90deg)' }}>
+                          <circle cx="48" cy="48" r={r} fill="none" stroke="#1f2937" strokeWidth="8" />
+                          <circle cx="48" cy="48" r={r} fill="none" stroke={ringColor} strokeWidth="8"
+                            strokeDasharray={`${filled} ${circ - filled}`} strokeLinecap="round" />
+                        </svg>
+                        <span className="relative z-10 text-2xl font-black" style={{ color }}>{score}</span>
+                      </div>
+                      <h3 className="text-sm font-semibold text-white mb-2">{label}</h3>
+                      <p className="text-xs text-gray-500 leading-relaxed">{desc}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* How it works */}
+            <div className="mb-16">
+              <p className="text-xs text-gray-600 uppercase tracking-widest font-mono text-center mb-8">How it works</p>
+              <div className="relative">
+                <div className="absolute left-5 top-8 bottom-8 w-px bg-gray-800 hidden sm:block" />
+                <div className="space-y-4">
+                  {[
+                    { n: '01', title: 'Paste a conversation', body: 'Any conversation with an AI assistant — copy and paste the transcript into Cognify.' },
+                    { n: '02', title: 'Get your cognitive scores', body: 'Cognify analyses your critical thinking, depth, and engagement. Flagged claims are colour-coded by risk level — high, medium, or verified.' },
+                    { n: '03', title: 'Build your profile', body: 'Every session adds to your longitudinal profile. Blind spots emerge. A cognitive fingerprint — a plain-English narrative of your thinking habits — is generated over time.' },
+                  ].map(({ n, title, body }) => (
+                    <div key={n} className="flex items-start gap-5 bg-gray-900 border border-gray-800 rounded-2xl p-5">
+                      <span className="text-xs font-mono font-bold text-indigo-500 bg-indigo-500/10 border border-indigo-500/20 rounded-lg w-10 h-10 flex items-center justify-center flex-shrink-0">{n}</span>
+                      <div>
+                        <h3 className="text-sm font-semibold text-white mb-1">{title}</h3>
+                        <p className="text-sm text-gray-500 leading-relaxed">{body}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Fingerprint preview */}
+            <div className="mb-16 bg-gray-900 border border-indigo-500/20 rounded-2xl p-6">
+              <p className="text-xs text-indigo-400 uppercase tracking-widest font-mono mb-4">Sample cognitive fingerprint</p>
+              <p className="text-sm text-indigo-300/80 leading-relaxed italic">
+                "You engage most deeply with <strong className="text-indigo-200">AI, productivity, and health</strong> topics, where your critical thinking is most active. You show a recurring pattern of reduced scrutiny around <strong className="text-red-400">health claims</strong> — these are areas where epistemic vigilance may be worth consciously raising. Your skepticism is well-calibrated toward <strong className="text-emerald-400">science content</strong>. Your critical thinking trend is <strong className="text-indigo-200">improving</strong> — you ask better questions with each session."
+              </p>
+            </div>
+
+            {/* Claim example */}
+            <div className="mb-16">
+              <p className="text-xs text-gray-600 uppercase tracking-widest font-mono text-center mb-8">Claim risk detection</p>
+              <div className="space-y-3">
+                {[
+                  { risk: 'high', color: 'red', border: 'border-red-500/30', bg: 'bg-red-500/5', dot: 'bg-red-500', badge: 'text-red-400', label: 'HIGH RISK', text: '"Vitamin D supplements can cure depression"', tag: '#health' },
+                  { risk: 'medium', color: 'yellow', border: 'border-yellow-500/30', bg: 'bg-yellow-500/5', dot: 'bg-yellow-400', badge: 'text-yellow-400', label: 'MEDIUM', text: '"AI tools are making everyone smarter"', tag: '#AI/productivity' },
+                  { risk: 'low', color: 'emerald', border: 'border-emerald-500/30', bg: 'bg-emerald-500/5', dot: 'bg-emerald-500', badge: 'text-emerald-400', label: 'VERIFIED', text: '"5G conspiracy claims lack scientific basis"', tag: '#science' },
+                ].map(c => (
+                  <div key={c.label} className={`border ${c.border} ${c.bg} rounded-xl p-3 flex items-center gap-3`}>
+                    <span className={`w-2 h-2 rounded-full ${c.dot} flex-shrink-0`} />
+                    <span className={`text-xs font-mono font-bold ${c.badge} flex-shrink-0`}>{c.label}</span>
+                    <span className="text-sm text-gray-300 flex-1">{c.text}</span>
+                    <span className="text-xs text-gray-600 font-mono flex-shrink-0">{c.tag}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Bottom CTA */}
+            <div className="text-center border-t border-gray-800 pt-16 pb-8">
+              <h2 className="text-2xl font-bold text-white mb-3">Ready to see your cognitive score?</h2>
+              <p className="text-gray-500 text-sm mb-8">Run the demo in under 30 seconds — no sign-up required.</p>
+              <button
+                onClick={handleDemoFromHome}
+                className="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-10 py-3.5 rounded-xl text-sm transition-colors">
+                Run Demo
+              </button>
+            </div>
+          </div>
+        )}
+
 
         {/* ── ANALYZE VIEW ────────────────────────────────────────── */}
         {view === 'analyze' && (
