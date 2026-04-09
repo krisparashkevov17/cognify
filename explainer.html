@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CognitionOS — Technical & Concept Explainer</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #fafafa;
+    --surface: #ffffff;
+    --border: #e2e8f0;
+    --indigo: #4f46e5;
+    --indigo-light: #eef2ff;
+    --emerald: #059669;
+    --emerald-light: #ecfdf5;
+    --amber: #d97706;
+    --amber-light: #fffbeb;
+    --red: #dc2626;
+    --red-light: #fef2f2;
+    --text: #0f172a;
+    --muted: #64748b;
+    --subtle: #f8fafc;
+  }
+
+  html { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
+
+  body { max-width: 780px; margin: 0 auto; padding: 60px 32px 80px; }
+
+  /* ── TYPOGRAPHY ── */
+  h1 { font-size: 2.4rem; font-weight: 800; line-height: 1.15; color: var(--text); }
+  h2 { font-size: 1.5rem; font-weight: 700; color: var(--text); margin-top: 48px; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+  h3 { font-size: 1.1rem; font-weight: 600; color: var(--text); margin-top: 24px; margin-bottom: 8px; }
+  p  { font-size: 1rem; color: #374151; line-height: 1.75; margin-bottom: 14px; }
+  li { font-size: 0.975rem; color: #374151; line-height: 1.7; margin-bottom: 4px; }
+
+  .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--indigo); margin-bottom: 10px; display: block;
+  }
+
+  /* ── HEADER ── */
+  .doc-header { border-bottom: 2px solid var(--text); padding-bottom: 28px; margin-bottom: 12px; }
+  .doc-meta { margin-top: 14px; display: flex; gap: 20px; flex-wrap: wrap; }
+  .doc-meta span { font-size: 13px; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+
+  /* ── CALLOUT ── */
+  .callout {
+    border-radius: 10px; padding: 18px 22px; margin: 20px 0;
+    border-left: 4px solid;
+  }
+  .callout.indigo { background: var(--indigo-light); border-color: var(--indigo); }
+  .callout.green  { background: var(--emerald-light); border-color: var(--emerald); }
+  .callout.red    { background: var(--red-light);     border-color: var(--red);     }
+  .callout.amber  { background: var(--amber-light);   border-color: var(--amber);   }
+  .callout p { margin: 0; }
+  .callout.indigo p { color: #3730a3; }
+  .callout.green  p { color: #065f46; }
+  .callout.red    p { color: #991b1b; }
+  .callout.amber  p { color: #92400e; }
+
+  /* ── TABLE ── */
+  table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 0.9rem; }
+  th { background: var(--subtle); padding: 10px 14px; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border); }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--border); color: #374151; vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+
+  /* ── CODE ── */
+  code { font-family: 'JetBrains Mono', monospace; font-size: 0.85em; background: #f1f5f9; padding: 2px 6px; border-radius: 4px; color: var(--indigo); }
+  pre {
+    background: #0f172a; color: #e2e8f0; border-radius: 10px; padding: 20px 24px;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; line-height: 1.65;
+    overflow-x: auto; margin: 16px 0;
+  }
+  pre .k { color: #c084fc; }
+  pre .s { color: #86efac; }
+  pre .c { color: #64748b; font-style: italic; }
+  pre .n { color: #7dd3fc; }
+
+  /* ── BADGE ── */
+  .badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    border-radius: 5px; padding: 2px 8px; font-size: 12px;
+    font-family: 'JetBrains Mono', monospace; font-weight: 600; vertical-align: middle;
+  }
+  .badge.high   { background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; }
+  .badge.medium { background: #fffbeb; border: 1px solid #fde68a; color: #d97706; }
+  .badge.low    { background: #ecfdf5; border: 1px solid #a7f3d0; color: #059669; }
+
+  /* ── DIVIDER ── */
+  hr { border: none; border-top: 1px solid var(--border); margin: 36px 0; }
+
+  /* ── SCORE WIDGET ── */
+  .score-row { display: flex; gap: 16px; margin: 16px 0; flex-wrap: wrap; }
+  .score-box {
+    flex: 1; min-width: 120px; border: 1px solid var(--border); border-radius: 10px;
+    padding: 16px; text-align: center;
+  }
+  .score-val { font-size: 2rem; font-weight: 800; }
+  .score-val.ind { color: var(--indigo); }
+  .score-val.em  { color: var(--emerald); }
+  .score-val.amb { color: var(--amber); }
+  .score-lbl { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-top: 4px; }
+
+  /* ── PRINT ── */
+  @media print {
+    body { padding: 32px; }
+    a { color: inherit; text-decoration: none; }
+    @page { margin: 1.5cm; }
+  }
+
+  ul, ol { padding-left: 22px; margin-bottom: 14px; }
+  ul li { list-style: disc; }
+  ol li { list-style: decimal; }
+
+  .fingerprint-box {
+    background: var(--indigo-light); border: 1px solid #c7d2fe;
+    border-radius: 10px; padding: 20px 24px;
+    font-style: italic; color: #3730a3; line-height: 1.8; font-size: 0.95rem;
+    margin: 16px 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<header class="doc-header">
+  <span class="label">Technical & Concept Explainer</span>
+  <h1>CognitionOS</h1>
+  <p style="font-size:1.15rem; color: var(--muted); margin-top:12px; margin-bottom:0;">
+    A cognitive analysis interface that tracks the quality of how you think — not just what you read.
+  </p>
+  <div class="doc-meta">
+    <span>Version 0.1 — Hackathon Build</span>
+    <span>April 2025</span>
+    <span>React · Tailwind · Anthropic-ready</span>
+  </div>
+</header>
+
+
+<!-- ── SECTION 1 ── -->
+<h2>1. What Is CognitionOS?</h2>
+<p>
+  CognitionOS is a single-page web application that analyses conversation transcripts through the lens of <strong>cognitive quality</strong>. It does not fact-check. It does not summarise. Instead, it asks: <em>How well did you think during this conversation?</em>
+</p>
+<p>
+  The application extracts structured signals from any conversation — typically a human interacting with an AI assistant — and returns scores, flagged claims, engagement patterns, and a cumulative profile that evolves across multiple sessions.
+</p>
+<div class="callout indigo">
+  <p><strong>Core distinction:</strong> Every other AI-adjacent tool focuses on the output — what was said, what was generated, what is true. CognitionOS focuses on the <em>process</em> — how critically, deeply, and carefully a person engaged with the information they encountered.</p>
+</div>
+
+
+<!-- ── SECTION 2 ── -->
+<h2>2. The Problem It Solves</h2>
+
+<h3>2.1 The Epistemic Blind Spot</h3>
+<p>
+  Humans have consistent patterns in where their critical faculties are strong — and where they are weak. A person may be rigorously skeptical about political claims while accepting health information uncritically. A student may ask excellent questions about engineering concepts but absorb nutrition myths without challenge.
+</p>
+<p>
+  These patterns are almost entirely invisible. No existing tool reveals them. We leave conversations with no feedback on <em>how</em> we engaged — only with whatever content we happened to receive.
+</p>
+
+<h3>2.2 The AI Amplification Problem</h3>
+<p>
+  AI assistants have become a primary information interface for hundreds of millions of people. They are authoritative in tone, fluent in language, and capable of presenting false information convincingly. When a person with a blind spot in health reasoning encounters a confident AI-generated health claim, the result is uncritical acceptance at scale.
+</p>
+<p>
+  This is not a failure of AI. It is a failure of the epistemic feedback loop. CognitionOS closes that loop.
+</p>
+
+<h3>2.3 What Is Currently Missing</h3>
+<table>
+  <thead>
+    <tr><th>Existing Tool</th><th>What It Does</th><th>What It Misses</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Fact-checkers</td><td>Verify specific claims against known sources</td><td>Does not reveal <em>why</em> the user accepted the claim in the first place</td></tr>
+    <tr><td>AI assistants</td><td>Generate responses to queries</td><td>Provide no feedback on user reasoning quality</td></tr>
+    <tr><td>Readability tools</td><td>Measure text complexity</td><td>Measure the text, not the reader's engagement with it</td></tr>
+    <tr><td>IQ / cognitive tests</td><td>Static baseline measurement</td><td>Not contextual, not longitudinal, not conversation-based</td></tr>
+    <tr><td><strong>CognitionOS</strong></td><td><strong>Analyses cognitive patterns in real conversation</strong></td><td><strong>—</strong></td></tr>
+  </tbody>
+</table>
+
+
+<!-- ── SECTION 3 ── -->
+<h2>3. How It Works</h2>
+
+<h3>3.1 Input</h3>
+<p>
+  The user pastes any conversation transcript into the analysis field. The format is flexible — the extraction engine is designed to handle natural conversation formats (<code>User: ...</code> / <code>Assistant: ...</code>) as well as freeform discussion. A built-in demo injects a realistic pre-written conversation covering AI productivity, health claims, and skepticism of conspiracy content.
+</p>
+
+<h3>3.2 Extraction Engine</h3>
+<p>
+  The application sends the conversation to an analysis function using the following extraction prompt (stored as a constant for full transparency and auditability):
+</p>
+<pre>
+<span class="c">// EXTRACTION_PROMPT — the instruction sent to the analysis engine</span>
+<span class="k">const</span> <span class="n">EXTRACTION_PROMPT</span> = <span class="s">`
+You are a cognitive analysis engine. Given a conversation transcript, extract:
+1. Critical thinking score (0-100)
+2. Depth score (0-100)
+3. Engagement score (0-100)
+4. Flagged claims with risk level (high/medium/low) and category tag
+5. Topics discussed
+6. Engagement signals (behavioural patterns)
+7. Summary: 2-3 sentence narrative of cognitive patterns
+
+Return strict JSON:
+{
+  "scores": { "criticalThinking": number, "depth": number, "engagement": number },
+  "claims": [{ "text": string, "risk": "high"|"medium"|"low", "tag": string }],
+  "topics": string[],
+  "engagementSignals": string[],
+  "summary": string
+}
+`</span>;
+</pre>
+<p>
+  In the current hackathon build, a <strong>mock adapter</strong> returns realistic hardcoded output matching this schema exactly. The adapter is isolated in a single function (<code>runMockAnalysis</code>) so that switching to a live Anthropic API call requires changing only that function — the rest of the application is unaffected.
+</p>
+
+<h3>3.3 Cognitive Scores</h3>
+<div class="score-row">
+  <div class="score-box">
+    <div class="score-val ind">CT</div>
+    <div class="score-lbl">Critical Thinking</div>
+  </div>
+  <div class="score-box">
+    <div class="score-val em">DPT</div>
+    <div class="score-lbl">Depth</div>
+  </div>
+  <div class="score-box">
+    <div class="score-val amb">ENG</div>
+    <div class="score-lbl">Engagement</div>
+  </div>
+</div>
+<ul>
+  <li><strong>Critical Thinking (0–100):</strong> How much the user challenges, questions, and evaluates claims rather than accepting them passively.</li>
+  <li><strong>Depth (0–100):</strong> How substantively the user explores topics — follow-up questions, nuance-seeking, mechanism-probing.</li>
+  <li><strong>Engagement (0–100):</strong> How actively the user participates — response quality, contribution volume, topic coverage.</li>
+</ul>
+
+<h3>3.4 Claim Risk Mapping</h3>
+<p>Each significant claim in the conversation is extracted and classified:</p>
+<ul>
+  <li><span class="badge high">HIGH RISK</span> — Unverified, medically dangerous, or factually contested claims (e.g. "supplements can cure depression")</li>
+  <li><span class="badge medium">MEDIUM</span> — Oversimplified, partially true, or context-dependent claims</li>
+  <li><span class="badge low">VERIFIED</span> — Well-supported, scientifically grounded, or appropriately qualified positions</li>
+</ul>
+
+<h3>3.5 Longitudinal Profile</h3>
+<p>
+  Every analysed session is persisted to storage (using <code>window.storage</code> → <code>localStorage</code> → in-memory fallback). Across sessions, the application builds:
+</p>
+<ul>
+  <li><strong>Topic frequency map:</strong> A visual tag cloud of subjects discussed, sized by recurrence.</li>
+  <li><strong>Score trend line:</strong> SVG line chart of Critical Thinking and Depth across sessions over time.</li>
+  <li><strong>Blind spots:</strong> Topic categories where HIGH RISK claims were repeatedly accepted.</li>
+  <li><strong>Strengths:</strong> Topic categories where the user consistently demonstrates calibrated skepticism.</li>
+</ul>
+
+<h3>3.6 The Cognitive Fingerprint</h3>
+<p>
+  The fingerprint is a dynamically generated second-person narrative paragraph synthesising all profile data into a plain-English description of the user's epistemic habits. Example:
+</p>
+<div class="fingerprint-box">
+  "You engage most deeply with AI, productivity, health topics, where your critical thinking is most active and your questioning most structured. Across 4 sessions, your critical thinking registers as moderate (avg 55/100) with a depth score of 61/100 — indicating substantive exploration of ideas. You show a recurring pattern of reduced scrutiny around "health" and "nutrition" claims — these are areas where epistemic vigilance may be worth consciously raising. Your skepticism is well-calibrated toward science content. Your critical thinking trend is improving over time — you are asking better, more precise questions with each session."
+</div>
+
+
+<!-- ── SECTION 4 ── -->
+<h2>4. Societal Relevance</h2>
+
+<h3>4.1 The Misinformation Crisis</h3>
+<p>
+  The World Health Organisation declared an "infodemic" alongside the COVID-19 pandemic — a recognition that misinformation spreads faster than corrections and causes direct harm. Health misinformation alone contributes to vaccine hesitancy, dangerous self-treatment, and preventable deaths. The root mechanism is not the existence of false information — false information has always existed — but the failure of individuals to apply consistent skepticism when encountering it.
+</p>
+<p>
+  CognitionOS addresses this at the source: not by removing false information, but by making visible the cognitive patterns that allow it to take hold.
+</p>
+
+<h3>4.2 AI and Epistemic Dependency</h3>
+<p>
+  Studies on AI-assisted work show that users frequently accept AI output without verification, particularly in domains where they feel less confident. This creates a feedback loop: low confidence in a domain → high AI reliance → uncritical acceptance → no skill development → lower confidence. CognitionOS can break this loop by surfacing where reliance is highest and where scrutiny is lowest.
+</p>
+
+<h3>4.3 Education and Measurable Epistemic Growth</h3>
+<p>
+  Critical thinking is widely cited as a core educational objective — and almost universally unmeasured. Standardised tests measure content recall. Essays measure communication. Nothing measures the quality of reasoning <em>in context</em>. CognitionOS makes critical thinking a quantifiable, trackable metric, enabling educators to demonstrate improvement, identify struggling students, and design targeted interventions.
+</p>
+
+<h3>4.4 Democratic and Civic Implications</h3>
+<p>
+  Healthy democracies depend on citizens who can evaluate competing claims. The decline of epistemic norms — the erosion of shared standards for what counts as evidence — is widely documented as a threat to democratic function. A tool that gives individuals a personal accountability metric for their reasoning quality is, at scale, a civic infrastructure tool.
+</p>
+
+<div class="callout green">
+  <p><strong>The core argument:</strong> You cannot improve what you cannot measure. CognitionOS makes epistemic quality measurable for the first time in a natural, conversational context.</p>
+</div>
+
+
+<!-- ── SECTION 5 ── -->
+<h2>5. Technical Architecture</h2>
+
+<h3>5.1 Stack</h3>
+<table>
+  <thead><tr><th>Layer</th><th>Technology</th><th>Rationale</th></tr></thead>
+  <tbody>
+    <tr><td>UI Framework</td><td>React 18</td><td>Component model suits the dashboard pattern; fast iteration</td></tr>
+    <tr><td>Styling</td><td>Tailwind CSS 3</td><td>Utility-first enables rapid, consistent dark UI</td></tr>
+    <tr><td>Build</td><td>Vite 5</td><td>Fast HMR, zero config, ideal for hackathon pace</td></tr>
+    <tr><td>Analysis</td><td>Mock adapter (API-ready)</td><td>Isolated function; swap for Anthropic SDK call without refactor</td></tr>
+    <tr><td>Persistence</td><td>window.storage → localStorage → in-memory</td><td>Graceful degradation; no backend required</td></tr>
+  </tbody>
+</table>
+
+<h3>5.2 File Structure</h3>
+<pre>
+hackathon/
+├── index.html
+├── vite.config.js
+├── tailwind.config.js
+├── postcss.config.js
+├── package.json
+└── src/
+    ├── main.jsx        <span class="c">// React entry point</span>
+    ├── index.css       <span class="c">// Tailwind directives + base styles</span>
+    └── App.jsx         <span class="c">// Entire app: logic + components (single-file)</span>
+</pre>
+
+<h3>5.3 Key Abstractions in App.jsx</h3>
+<ul>
+  <li><code>EXTRACTION_PROMPT</code> — the analysis instruction, stored as a constant for parity between mock and real modes</li>
+  <li><code>runMockAnalysis()</code> — isolated adapter; replace with Anthropic API call to go live</li>
+  <li><code>storageGet() / storageSet()</code> — storage wrapper with three-tier fallback</li>
+  <li><code>aggregateProfile(sessions)</code> — pure function: sessions array → profile object</li>
+  <li><code>generateFingerprint(profile)</code> — pure function: profile → narrative string</li>
+  <li><code>CircularScore</code>, <code>ClaimBadge</code>, <code>TrendChart</code>, <code>TopicMap</code> — presentational components</li>
+</ul>
+
+<h3>5.4 Enabling Real API Integration</h3>
+<p>To replace mock analysis with a live Anthropic call:</p>
+<ol>
+  <li>Add <code>VITE_ANTHROPIC_API_KEY=your-key</code> to a <code>.env</code> file</li>
+  <li>Replace <code>runMockAnalysis</code> with a <code>fetch</code> call to the Anthropic Messages API using <code>EXTRACTION_PROMPT</code> + the conversation as user content</li>
+  <li>Parse the JSON from the model's response — schema is identical to the mock output</li>
+</ol>
+<p>No other code changes are required.</p>
+
+
+<!-- ── SECTION 6 ── -->
+<h2>6. Demo Flow</h2>
+<ol>
+  <li>Open the app at <code>http://localhost:5173</code></li>
+  <li>Click <strong>Demo</strong> on the Analyze view</li>
+  <li>A realistic conversation about AI productivity, vitamin D and depression, and 5G conspiracy is injected</li>
+  <li>Analysis runs automatically (~1.3s mock delay)</li>
+  <li>Results appear: scores (Critical Thinking: 69, Depth: 73, Engagement: 85), four flagged claims, engagement signals, summary</li>
+  <li>Navigate to <strong>Profile</strong> view</li>
+  <li>Three historical sessions (seeded: 3-week trend) are already populated</li>
+  <li>Score trend line, topic knowledge map, blind spot (<code>health</code>), strength (<code>science</code>), and cognitive fingerprint are all visible</li>
+  <li>Reload page — data persists via localStorage</li>
+</ol>
+
+
+<!-- ── SECTION 7 ── -->
+<h2>7. Limitations and Honest Assessment</h2>
+<div class="callout amber">
+  <p><strong>This is a hackathon prototype.</strong> The analysis in the current build is mock/heuristic. Scores are derived from simple signals (question count, word count) rather than real cognitive analysis. The value of the architecture is in the structure, the data model, and the UX — not the current precision of the mock engine.</p>
+</div>
+<ul>
+  <li><strong>Mock only:</strong> Real cognitive scoring requires live LLM analysis. The prompt and schema are production-ready; the adapter is not.</li>
+  <li><strong>Client-side API keys:</strong> Direct browser-to-Anthropic calls expose API keys. A backend proxy is needed for production.</li>
+  <li><strong>No authentication:</strong> All data is stored locally; no cross-device sync.</li>
+  <li><strong>Single-conversation granularity:</strong> The profile improves with more sessions but requires user effort to supply transcripts manually.</li>
+</ul>
+
+
+<!-- ── SECTION 8 ── -->
+<h2>8. Vision</h2>
+<p>
+  The long-term vision for CognitionOS is a standard layer for epistemic quality monitoring — embedded in AI assistants, browser extensions, and educational platforms. In the same way fitness trackers normalised tracking physical health metrics, CognitionOS aims to normalise tracking cognitive health metrics.
+</p>
+<p>
+  A future version analyses conversations in real time, aggregates anonymised patterns at population scale, and provides researchers, educators, and policymakers with the first empirical dataset on how critical thinking varies across domains, demographics, and AI usage patterns.
+</p>
+<p>
+  The core thesis is simple: <strong>in a world where AI generates the answers, the quality of the questions you ask — and the rigour with which you evaluate the responses — is the only meaningful measure of cognitive competence left.</strong> CognitionOS makes that quality visible.
+</p>
+
+<hr/>
+<p style="font-size: 0.85rem; color: var(--muted); text-align: center;">
+  CognitionOS · Hackathon Build · April 2025 · Built with React, Tailwind, Vite · Anthropic API integration ready
+</p>
+
+</body>
+</html>

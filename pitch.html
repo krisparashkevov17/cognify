@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Cognify — 2-Min Pitch</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:     #030712;
+    --s:      #0f172a;
+    --border: #1e293b;
+    --ind:    #6366f1;
+    --em:     #10b981;
+    --amb:    #f59e0b;
+    --red:    #ef4444;
+    --txt:    #f1f5f9;
+    --muted:  #475569;
+  }
+
+  html, body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--txt); -webkit-font-smoothing: antialiased; }
+
+  .slide {
+    width: 100%; min-height: 100vh;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    padding: 48px 64px; position: relative; border-bottom: 1px solid var(--border);
+    page-break-after: always; overflow: hidden;
+  }
+  .inner { max-width: 900px; width: 100%; position: relative; z-index: 2; }
+
+  .eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ind); margin-bottom: 16px; }
+  h1 { font-size: clamp(3rem, 6vw, 5rem); font-weight: 900; line-height: 1.0; }
+  h2 { font-size: clamp(1.6rem, 3vw, 2.4rem); font-weight: 800; line-height: 1.1; }
+  .tagline { font-size: 1.25rem; color: #64748b; margin-top: 16px; font-weight: 400; }
+
+  .num { position: absolute; bottom: 28px; right: 36px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #1e293b; }
+
+  /* ── BG GLOW ── */
+  .glow-ind { position: absolute; width: 600px; height: 600px; border-radius: 50%; background: radial-gradient(circle, rgba(99,102,241,.18) 0%, transparent 70%); pointer-events: none; z-index: 1; }
+  .glow-em  { position: absolute; width: 500px; height: 500px; border-radius: 50%; background: radial-gradient(circle, rgba(16,185,129,.14) 0%, transparent 70%); pointer-events: none; z-index: 1; }
+  .glow-red { position: absolute; width: 500px; height: 500px; border-radius: 50%; background: radial-gradient(circle, rgba(239,68,68,.12) 0%, transparent 70%); pointer-events: none; z-index: 1; }
+
+  /* ── LOGO ── */
+  .logo-mark { width: 64px; height: 64px; background: var(--ind); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 28px; }
+
+  /* ── NAV ── */
+  .nav { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 6px; background: rgba(15,23,42,.92); backdrop-filter: blur(8px); border: 1px solid var(--border); border-radius: 999px; padding: 8px 16px; z-index: 100; }
+  .nav a { width: 8px; height: 8px; border-radius: 50%; background: var(--border); display: block; transition: background .2s; }
+  .nav a:hover { background: var(--ind); }
+  @media print { .nav { display: none; } }
+
+  /* ── BIG STAT ── */
+  .big-stat { font-size: clamp(4rem, 10vw, 7rem); font-weight: 900; line-height: 1; letter-spacing: -0.02em; }
+  .big-stat-label { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); margin-top: 8px; font-family: 'JetBrains Mono', monospace; }
+
+  /* ── RING ── */
+  .ring-wrap { position: relative; display: inline-flex; align-items: center; justify-content: center; }
+  .ring-val  { position: absolute; font-size: 1.8rem; font-weight: 900; }
+
+  /* ── PILL ── */
+  .pill { display: inline-block; border: 1px solid var(--border); border-radius: 999px; padding: 5px 16px; font-size: 12px; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+
+  /* ── CLAIM ROW ── */
+  .claim { display: flex; align-items: center; gap: 12px; border: 1px solid rgba(239,68,68,.3); background: rgba(239,68,68,.05); border-radius: 10px; padding: 12px 16px; }
+  .claim-badge { font-size: 10px; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: var(--red); white-space: nowrap; border: 1px solid rgba(239,68,68,.4); border-radius: 5px; padding: 2px 8px; }
+  .claim-text { font-size: 0.88rem; color: #94a3b8; }
+
+  /* ── WHOOP ROW ── */
+  .w-row { display: flex; align-items: center; gap: 0; border-bottom: 1px solid var(--border); padding: 16px 0; }
+  .w-row:last-child { border-bottom: none; }
+  .w-brand { font-weight: 700; font-size: 1rem; width: 150px; flex-shrink: 0; }
+  .w-bar-wrap { flex: 1; height: 6px; background: var(--border); border-radius: 3px; margin: 0 20px; overflow: hidden; }
+  .w-bar { height: 100%; border-radius: 3px; background: var(--em); }
+  .w-price { font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; font-weight: 700; width: 80px; text-align: right; color: var(--em); }
+
+  /* ── ICON CARD ── */
+  .icon-card { background: var(--s); border: 1px solid var(--border); border-radius: 18px; padding: 32px 28px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .icon-card h3 { font-size: 1.05rem; font-weight: 700; }
+  .icon-card p { font-size: 0.82rem; color: var(--muted); line-height: 1.5; }
+  .icon-wrap { width: 60px; height: 60px; border-radius: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+  /* ── FINGERPRINT ── */
+  .fp { font-size: 0.9rem; font-style: italic; color: #818cf8; line-height: 1.8; border-left: 3px solid rgba(99,102,241,.4); padding-left: 16px; }
+
+  /* ── GRID ── */
+  .g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+  .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="#s1"></a><a href="#s2"></a><a href="#s3"></a><a href="#s4"></a>
+  <a href="#s5"></a><a href="#s6"></a><a href="#s7"></a>
+</nav>
+
+
+<!-- ══════════ S1 — TITLE -->
+<section class="slide" id="s1">
+  <div class="glow-ind" style="top:-200px; left:-100px;"></div>
+  <div class="glow-ind" style="bottom:-200px; right:-100px;"></div>
+  <div class="inner" style="display:flex; flex-direction:column; align-items:flex-start;">
+    <div class="logo-mark">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+        <circle cx="16" cy="16" r="5.5" fill="white"/>
+        <circle cx="16" cy="16" r="13" stroke="white" stroke-width="1.5" fill="none" stroke-dasharray="4 3"/>
+      </svg>
+    </div>
+    <div class="eyebrow">Hackathon 2025</div>
+    <h1 style="font-size: clamp(4rem, 9vw, 7rem); color: white;">Cognify</h1>
+    <p class="tagline" style="font-size:1.35rem; margin-top:20px; max-width:560px; color:#64748b; line-height:1.6;">
+      The world's first <strong style="color:white;">cognitive fitness tracker.</strong><br/>
+      Measuring how well you think — not just what you think about.
+    </p>
+    <div class="pill" style="margin-top:28px;">cognify.app · $15/mo · powered by Claude</div>
+  </div>
+  <div class="num">01 / 07</div>
+</section>
+
+
+<!-- ══════════ S2 — THE PROBLEM -->
+<section class="slide" id="s2">
+  <div class="glow-red" style="top:-150px; right:-100px;"></div>
+  <div class="inner">
+    <div class="eyebrow">The problem</div>
+
+    <!-- Top: three trackers we have vs the gap -->
+    <div class="g3" style="margin-bottom: 40px;">
+
+      <!-- Steps -->
+      <div class="icon-card">
+        <div class="icon-wrap" style="background: rgba(16,185,129,.15);">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+          </svg>
+        </div>
+        <div>
+          <h3 style="color:#10b981;">Physical</h3>
+          <div style="font-size:1.6rem; font-weight:900; color:white; margin:4px 0;">✓</div>
+          <p>Fitbit · Apple Watch<br/>Heart rate, steps, calories</p>
+        </div>
+      </div>
+
+      <!-- Sleep -->
+      <div class="icon-card">
+        <div class="icon-wrap" style="background: rgba(99,102,241,.15);">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+          </svg>
+        </div>
+        <div>
+          <h3 style="color:#818cf8;">Sleep</h3>
+          <div style="font-size:1.6rem; font-weight:900; color:white; margin:4px 0;">✓</div>
+          <p>WHOOP · Oura Ring<br/>Recovery, HRV, sleep stages</p>
+        </div>
+      </div>
+
+      <!-- Cognitive — THE GAP -->
+      <div class="icon-card" style="border-color:rgba(239,68,68,.4); background:rgba(239,68,68,.05);">
+        <div class="icon-wrap" style="background:rgba(239,68,68,.15);">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/>
+            <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/>
+          </svg>
+        </div>
+        <div>
+          <h3 style="color:#f87171;">Cognitive</h3>
+          <div style="font-size:1.6rem; font-weight:900; color:#ef4444; margin:4px 0;">✗</div>
+          <p style="color:#f87171; font-weight:600;">Nobody built this.<br/>Until now.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom: the stat -->
+    <div style="display:flex; align-items:center; gap:40px; border-top:1px solid var(--border); padding-top:32px;">
+      <div>
+        <div class="big-stat" style="color:var(--red);">65%</div>
+        <div class="big-stat-label">of health misinformation<br/>is accepted in conversation<br/>— without any pushback</div>
+      </div>
+      <div style="width:1px; height:80px; background:var(--border); flex-shrink:0;"></div>
+      <p style="font-size:1.05rem; color:#64748b; line-height:1.7; max-width:400px;">
+        AI assistants are authoritative in tone. When they present a false claim with confidence, users with no cognitive feedback loop accept it — at scale, instantly.
+      </p>
+    </div>
+  </div>
+  <div class="num">02 / 07</div>
+</section>
+
+
+<!-- ══════════ S3 — THE SHIFT -->
+<section class="slide" id="s3">
+  <div class="glow-ind" style="bottom:-200px; left:50%; transform:translateX(-50%);"></div>
+  <div class="inner">
+    <div class="eyebrow">The shift · quantified self</div>
+    <h2 style="margin-bottom:40px;">The world already pays to track itself.<br/><span style="color:var(--ind);">Cognitive performance is the last frontier.</span></h2>
+
+    <!-- Visual timeline -->
+    <div style="display:flex; align-items:stretch; gap:0; border:1px solid var(--border); border-radius:18px; overflow:hidden; margin-bottom:32px;">
+
+      <div style="flex:1; padding:28px 24px; border-right:1px solid var(--border); text-align:center;">
+        <div style="font-size:2rem; margin-bottom:8px;">🏃</div>
+        <div style="font-size:0.7rem; font-family:'JetBrains Mono',monospace; letter-spacing:0.12em; color:var(--muted); text-transform:uppercase; margin-bottom:12px;">2010s</div>
+        <div style="font-size:1.4rem; font-weight:900; color:var(--em);">$96B</div>
+        <div style="font-size:0.78rem; color:var(--muted); margin-top:4px;">Fitness wearables</div>
+        <div style="font-size:0.75rem; color:#334155; margin-top:10px;">Fitbit · Apple Watch<br/>Garmin · Samsung</div>
+      </div>
+
+      <div style="flex:1; padding:28px 24px; border-right:1px solid var(--border); text-align:center;">
+        <div style="font-size:2rem; margin-bottom:8px;">😴</div>
+        <div style="font-size:0.7rem; font-family:'JetBrains Mono',monospace; letter-spacing:0.12em; color:var(--muted); text-transform:uppercase; margin-bottom:12px;">2020s</div>
+        <div style="font-size:1.4rem; font-weight:900; color:var(--ind);">$30/mo</div>
+        <div style="font-size:0.78rem; color:var(--muted); margin-top:4px;">Sleep & recovery</div>
+        <div style="font-size:0.75rem; color:#334155; margin-top:10px;">WHOOP · Oura Ring<br/>Eight Sleep</div>
+      </div>
+
+      <div style="flex:1; padding:28px 24px; text-align:center; background:rgba(99,102,241,.06); border-left:2px solid rgba(99,102,241,.4);">
+        <div style="font-size:2rem; margin-bottom:8px;">🧠</div>
+        <div style="font-size:0.7rem; font-family:'JetBrains Mono',monospace; letter-spacing:0.12em; color:var(--ind); text-transform:uppercase; margin-bottom:12px;">Now ← We are here</div>
+        <div style="font-size:1.4rem; font-weight:900; color:var(--ind);">$70B+</div>
+        <div style="font-size:0.78rem; color:var(--muted); margin-top:4px;">Total wellness market</div>
+        <div style="font-size:0.85rem; color:#818cf8; margin-top:10px; font-weight:600;">No dominant player.<br/>Category is open.</div>
+      </div>
+
+    </div>
+
+    <div style="display:flex; align-items:center; justify-content:center; gap:8px; color:var(--muted); font-size:0.85rem;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      The quantified self habit is already established. Consumers pay monthly to know their numbers.
+    </div>
+  </div>
+  <div class="num">03 / 07</div>
+</section>
+
+
+<!-- ══════════ S4 — THE PRODUCT -->
+<section class="slide" id="s4">
+  <div class="glow-ind" style="top:-100px; right:-150px;"></div>
+  <div class="inner">
+    <div class="eyebrow">The product</div>
+    <h2 style="margin-bottom:36px;">Paste a conversation.<br/>Get your <span style="color:var(--ind);">cognitive score.</span></h2>
+
+    <div class="g2" style="align-items:start;">
+
+      <!-- Left: scores + claim -->
+      <div style="display:flex; flex-direction:column; gap:16px;">
+
+        <!-- Score rings -->
+        <div style="display:flex; gap:20px; background:var(--s); border:1px solid var(--border); border-radius:16px; padding:24px; justify-content:space-around;">
+          <!-- CT -->
+          <div style="text-align:center;">
+            <div class="ring-wrap">
+              <svg width="100" height="100" style="transform:rotate(-90deg);">
+                <circle cx="50" cy="50" r="40" fill="none" stroke="#1e293b" stroke-width="8"/>
+                <circle cx="50" cy="50" r="40" fill="none" stroke="#6366f1" stroke-width="8"
+                  stroke-dasharray="174 251" stroke-linecap="round"/>
+              </svg>
+              <span class="ring-val" style="color:#6366f1;">69</span>
+            </div>
+            <div style="font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--muted); margin-top:4px;">Critical<br/>Thinking</div>
+          </div>
+          <!-- Depth -->
+          <div style="text-align:center;">
+            <div class="ring-wrap">
+              <svg width="100" height="100" style="transform:rotate(-90deg);">
+                <circle cx="50" cy="50" r="40" fill="none" stroke="#1e293b" stroke-width="8"/>
+                <circle cx="50" cy="50" r="40" fill="none" stroke="#10b981" stroke-width="8"
+                  stroke-dasharray="183 251" stroke-linecap="round"/>
+              </svg>
+              <span class="ring-val" style="color:#10b981;">73</span>
+            </div>
+            <div style="font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--muted); margin-top:4px;">Depth</div>
+          </div>
+          <!-- Engagement -->
+          <div style="text-align:center;">
+            <div class="ring-wrap">
+              <svg width="100" height="100" style="transform:rotate(-90deg);">
+                <circle cx="50" cy="50" r="40" fill="none" stroke="#1e293b" stroke-width="8"/>
+                <circle cx="50" cy="50" r="40" fill="none" stroke="#f59e0b" stroke-width="8"
+                  stroke-dasharray="213 251" stroke-linecap="round"/>
+              </svg>
+              <span class="ring-val" style="color:#f59e0b;">85</span>
+            </div>
+            <div style="font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--muted); margin-top:4px;">Engagement</div>
+          </div>
+        </div>
+
+        <!-- Flagged claim -->
+        <div class="claim">
+          <span class="claim-badge">HIGH RISK</span>
+          <span class="claim-text">"Vitamin D can cure depression" <span style="color:#334155; font-size:0.78rem;">#health</span></span>
+        </div>
+
+        <!-- Low risk claim -->
+        <div style="display:flex; align-items:center; gap:12px; border:1px solid rgba(16,185,129,.3); background:rgba(16,185,129,.05); border-radius:10px; padding:12px 16px;">
+          <span style="font-size:10px; font-weight:700; font-family:'JetBrains Mono',monospace; color:var(--em); border:1px solid rgba(16,185,129,.4); border-radius:5px; padding:2px 8px; white-space:nowrap;">VERIFIED</span>
+          <span style="font-size:0.88rem; color:#94a3b8;">"5G conspiracy claims lack scientific basis" <span style="color:#334155; font-size:0.78rem;">#science</span></span>
+        </div>
+      </div>
+
+      <!-- Right: fingerprint card -->
+      <div style="background:rgba(99,102,241,.06); border:1px solid rgba(99,102,241,.25); border-radius:16px; padding:28px; display:flex; flex-direction:column; gap:20px; height:100%;">
+        <div>
+          <div style="font-size:0.7rem; text-transform:uppercase; letter-spacing:0.14em; color:var(--ind); font-family:'JetBrains Mono',monospace; margin-bottom:16px;">Cognitive Fingerprint</div>
+          <!-- Mini trend SVG -->
+          <svg viewBox="0 0 240 80" style="width:100%; margin-bottom:16px;">
+            <line x1="0" x2="240" y1="60" y2="60" stroke="#1e293b" stroke-width="1"/>
+            <!-- CT line: improving -->
+            <polyline points="20,58 80,48 140,38 200,22" fill="none" stroke="#6366f1" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- Depth line -->
+            <polyline points="20,52 80,44 140,40 200,30" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- Dots CT -->
+            <circle cx="20"  cy="58" r="3.5" fill="#6366f1"/>
+            <circle cx="80"  cy="48" r="3.5" fill="#6366f1"/>
+            <circle cx="140" cy="38" r="3.5" fill="#6366f1"/>
+            <circle cx="200" cy="22" r="3.5" fill="#6366f1"/>
+            <!-- Dots depth -->
+            <circle cx="20"  cy="52" r="3.5" fill="#10b981"/>
+            <circle cx="80"  cy="44" r="3.5" fill="#10b981"/>
+            <circle cx="140" cy="40" r="3.5" fill="#10b981"/>
+            <circle cx="200" cy="30" r="3.5" fill="#10b981"/>
+            <!-- Labels -->
+            <text x="20" y="75" font-size="9" fill="#475569" text-anchor="middle">Mar 19</text>
+            <text x="80" y="75" font-size="9" fill="#475569" text-anchor="middle">Mar 26</text>
+            <text x="140" y="75" font-size="9" fill="#475569" text-anchor="middle">Apr 2</text>
+            <text x="200" y="75" font-size="9" fill="#475569" text-anchor="middle">Apr 9</text>
+          </svg>
+          <div style="display:flex; gap:16px; margin-bottom:20px;">
+            <span style="font-size:11px; color:#64748b; display:flex; align-items:center; gap:5px;"><span style="display:inline-block; width:12px; height:2px; background:#6366f1; border-radius:2px;"></span>Critical Thinking ↑</span>
+            <span style="font-size:11px; color:#64748b; display:flex; align-items:center; gap:5px;"><span style="display:inline-block; width:12px; height:2px; background:#10b981; border-radius:2px;"></span>Depth</span>
+          </div>
+        </div>
+        <p class="fp">
+          "Recurring blind spot: <strong style="color:#f87171;">health claims</strong>. Strong skepticism toward <strong style="color:#34d399;">science content</strong>. Critical thinking is improving — you ask better questions each session."
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="num">04 / 07</div>
+</section>
+
+
+<!-- ══════════ S5 — BUSINESS MODEL -->
+<section class="slide" id="s5">
+  <div class="glow-em" style="bottom:-200px; right:-100px;"></div>
+  <div class="inner">
+    <div class="eyebrow">Business model</div>
+    <h2 style="margin-bottom:36px;">WHOOP for your mind.<br/><span style="color:var(--ind);">Subscription. Three tiers.</span></h2>
+
+    <!-- Comparison bars -->
+    <div style="background:var(--s); border:1px solid var(--border); border-radius:16px; padding:24px 28px; margin-bottom:24px;">
+      <div class="w-row">
+        <span class="w-brand" style="color:#64748b;">WHOOP 4.0</span>
+        <div class="w-bar-wrap"><div class="w-bar" style="width:100%; background:#10b981;"></div></div>
+        <span class="w-price">$30 / mo</span>
+      </div>
+      <div class="w-row">
+        <span class="w-brand" style="color:#64748b;">Oura Ring</span>
+        <div class="w-bar-wrap"><div class="w-bar" style="width:53%; background:#10b981;"></div></div>
+        <span class="w-price">$16 / mo</span>
+      </div>
+      <div class="w-row">
+        <span class="w-brand" style="color:#64748b;">Headspace</span>
+        <div class="w-bar-wrap"><div class="w-bar" style="width:43%; background:#10b981;"></div></div>
+        <span class="w-price">$13 / mo</span>
+      </div>
+      <div class="w-row" style="border-top:1px solid rgba(99,102,241,.3); margin-top:8px; padding-top:20px;">
+        <span class="w-brand" style="color:white; font-size:1.1rem;">Cognify</span>
+        <div class="w-bar-wrap"><div class="w-bar" style="width:50%; background:var(--ind);"></div></div>
+        <span class="w-price" style="color:var(--ind); font-size:1.05rem;">$15 / mo</span>
+      </div>
+    </div>
+
+    <!-- Tiers -->
+    <div class="g3">
+      <div style="border:1px solid var(--border); border-radius:14px; padding:20px; text-align:center;">
+        <div style="font-size:0.7rem; text-transform:uppercase; letter-spacing:0.12em; color:var(--muted); font-family:'JetBrains Mono',monospace; margin-bottom:12px;">Free</div>
+        <div style="font-size:2rem; font-weight:900; color:white;">$0</div>
+        <div style="font-size:0.8rem; color:var(--muted); margin-top:8px; line-height:1.5;">1 analysis/week<br/>Basic scores only</div>
+      </div>
+      <div style="border:1px solid rgba(99,102,241,.4); border-radius:14px; padding:20px; text-align:center; background:rgba(99,102,241,.06);">
+        <div style="font-size:0.7rem; text-transform:uppercase; letter-spacing:0.12em; color:var(--ind); font-family:'JetBrains Mono',monospace; margin-bottom:12px;">Pro</div>
+        <div style="font-size:2rem; font-weight:900; color:var(--ind);">$15</div>
+        <div style="font-size:0.7rem; color:var(--muted);">/month</div>
+        <div style="font-size:0.8rem; color:#94a3b8; margin-top:8px; line-height:1.5;">Unlimited · Profile<br/>Fingerprint · Blind spots</div>
+      </div>
+      <div style="border:1px solid rgba(245,158,11,.3); border-radius:14px; padding:20px; text-align:center; background:rgba(245,158,11,.05);">
+        <div style="font-size:0.7rem; text-transform:uppercase; letter-spacing:0.12em; color:var(--amb); font-family:'JetBrains Mono',monospace; margin-bottom:12px;">Enterprise</div>
+        <div style="font-size:1.4rem; font-weight:900; color:var(--amb); line-height:1.2; margin-top:4px;">B2B /<br/>Edu</div>
+        <div style="font-size:0.8rem; color:#94a3b8; margin-top:8px; line-height:1.5;">Per-seat licensing<br/>LMS / API integration</div>
+      </div>
+    </div>
+  </div>
+  <div class="num">05 / 07</div>
+</section>
+
+
+<!-- ══════════ S6 — MARKET -->
+<section class="slide" id="s6">
+  <div class="glow-ind" style="top:50%; left:50%; transform:translate(-50%,-50%);"></div>
+  <div class="inner">
+    <div class="eyebrow">Market opportunity</div>
+    <h2 style="margin-bottom:44px;">Three forces.<br/><span style="color:var(--ind);">One window.</span></h2>
+
+    <div class="g3" style="text-align:center;">
+      <div>
+        <div class="big-stat" style="color:var(--em);">180M</div>
+        <div class="big-stat-label">weekly AI<br/>assistant users</div>
+        <p style="font-size:0.82rem; color:var(--muted); margin-top:12px; line-height:1.5;">No cognitive feedback loop.<br/>That's the addressable market.</p>
+      </div>
+      <div style="border-left:1px solid var(--border); border-right:1px solid var(--border); padding:0 32px;">
+        <div class="big-stat" style="color:var(--ind);">$70B</div>
+        <div class="big-stat-label">wellness tech<br/>market size</div>
+        <p style="font-size:0.82rem; color:var(--muted); margin-top:12px; line-height:1.5;">Consumers already pay monthly<br/>for self-tracking.</p>
+      </div>
+      <div>
+        <div class="big-stat" style="color:var(--amb);">1 in 3</div>
+        <div class="big-stat-label">employers now<br/>require AI literacy</div>
+        <p style="font-size:0.82rem; color:var(--muted); margin-top:12px; line-height:1.5;">Cognitive quality is becoming<br/>a professional credential.</p>
+      </div>
+    </div>
+
+    <div style="margin-top:44px; border-top:1px solid var(--border); padding-top:28px; display:flex; align-items:center; gap:16px;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      <p style="font-size:0.95rem; color:#64748b; line-height:1.6;">
+        AI adoption accelerates anxiety about over-reliance. <strong style="color:white;">Cognify turns that anxiety into a subscription habit.</strong>
+      </p>
+    </div>
+  </div>
+  <div class="num">06 / 07</div>
+</section>
+
+
+<!-- ══════════ S7 — CLOSE -->
+<section class="slide" id="s7" style="background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(99,102,241,.12) 0%, transparent 65%);">
+  <div class="inner" style="text-align:center; display:flex; flex-direction:column; align-items:center;">
+
+    <!-- Three icons in a row -->
+    <div style="display:flex; align-items:center; gap:24px; margin-bottom:44px; opacity:0.6;">
+      <div style="text-align:center;">
+        <div style="font-size:2.2rem;">🏃</div>
+        <div style="font-size:0.75rem; color:var(--em); margin-top:6px; font-family:'JetBrains Mono',monospace;">STEPS ✓</div>
+      </div>
+      <div style="width:40px; height:1px; background:var(--border);"></div>
+      <div style="text-align:center;">
+        <div style="font-size:2.2rem;">😴</div>
+        <div style="font-size:0.75rem; color:var(--ind); margin-top:6px; font-family:'JetBrains Mono',monospace;">SLEEP ✓</div>
+      </div>
+      <div style="width:40px; height:1px; background:var(--border);"></div>
+      <div style="text-align:center; opacity:1;">
+        <div style="font-size:2.2rem;">🧠</div>
+        <div style="font-size:0.75rem; color:var(--red); margin-top:6px; font-family:'JetBrains Mono',monospace;">THINKING ✗</div>
+      </div>
+    </div>
+
+    <h2 style="font-size:clamp(1.8rem,4vw,3rem); max-width:700px; line-height:1.15;">
+      Nobody tracked how well<br/>we <em style="font-style:normal; color:var(--ind);">thought.</em>
+    </h2>
+
+    <p style="font-size:1.3rem; color:#64748b; margin-top:20px; margin-bottom:44px;">
+      Until now.
+    </p>
+
+    <!-- CTA pills -->
+    <div style="display:flex; gap:16px; flex-wrap:wrap; justify-content:center;">
+      <div style="border:1px solid rgba(99,102,241,.4); background:rgba(99,102,241,.08); border-radius:14px; padding:18px 32px; text-align:center;">
+        <div style="font-size:1.6rem; font-weight:900; color:var(--ind);">$15 / mo</div>
+        <div style="font-size:0.75rem; color:var(--muted); margin-top:4px; font-family:'JetBrains Mono',monospace;">CONSUMER · PRO</div>
+      </div>
+      <div style="border:1px solid rgba(16,185,129,.3); background:rgba(16,185,129,.06); border-radius:14px; padding:18px 32px; text-align:center;">
+        <div style="font-size:1.6rem; font-weight:900; color:var(--em);">Enterprise</div>
+        <div style="font-size:0.75rem; color:var(--muted); margin-top:4px; font-family:'JetBrains Mono',monospace;">B2B · EDUCATION</div>
+      </div>
+      <div style="border:1px solid rgba(245,158,11,.3); background:rgba(245,158,11,.06); border-radius:14px; padding:18px 32px; text-align:center;">
+        <div style="font-size:1.6rem; font-weight:900; color:var(--amb);">API</div>
+        <div style="font-size:0.75rem; color:var(--muted); margin-top:4px; font-family:'JetBrains Mono',monospace;">EMBED ANYWHERE</div>
+      </div>
+    </div>
+
+    <p style="margin-top:36px; font-size:1rem; color:#334155; font-family:'JetBrains Mono',monospace; letter-spacing:0.05em;">
+      The market is there. The timing is right. The product is live.
+    </p>
+  </div>
+  <div class="num">07 / 07</div>
+</section>
+
+</body>
+</html>
