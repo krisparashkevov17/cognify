@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>Cognify — Auto Demo</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --bg:#030712;--s:#0f172a;--bd:#1e293b;--ind:#6366f1;--em:#10b981;--amb:#f59e0b;--red:#ef4444;--txt:#f1f5f9;--mu:#64748b; }
+  html,body { font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var(--txt); -webkit-font-smoothing:antialiased; width:1280px; height:720px; overflow:hidden; }
+  #app { width:1280px; height:720px; display:flex; flex-direction:column; overflow:hidden; }
+
+  /* header */
+  header { border-bottom:1px solid var(--bd); padding:13px 40px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; background:rgba(3,7,18,.96); z-index:10; }
+  .lm { width:28px; height:28px; background:var(--ind); border-radius:7px; display:flex; align-items:center; justify-content:center; }
+  .ln { font-weight:700; font-size:15px; color:#fff; margin-left:10px; }
+  nav button { padding:6px 16px; border-radius:7px; font-size:13px; border:none; cursor:pointer; background:transparent; color:var(--mu); font-family:'Inter',sans-serif; transition:all .2s; }
+  nav button.active { background:#1e293b; color:#fff; }
+  nav button.hl { background:rgba(99,102,241,.2); color:var(--ind); box-shadow:0 0 0 2px rgba(99,102,241,.3); }
+
+  /* scrollable */
+  .view { flex:1; overflow:hidden; }
+  .si { height:100%; overflow-y:scroll; padding:32px 72px; scrollbar-width:none; }
+  .si::-webkit-scrollbar { display:none; }
+
+  /* screens */
+  .scr { display:none; }
+  .scr.on { display:block; }
+
+  /* --- HOME --- */
+  .hero { text-align:center; padding:36px 0 28px; position:relative; }
+  .hero::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse 60% 50% at 50% 0%, rgba(99,102,241,.15) 0%, transparent 70%); pointer-events:none; }
+  .hbadge { display:inline-block; border:1px solid rgba(99,102,241,.3); background:rgba(99,102,241,.1); border-radius:999px; padding:4px 14px; font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--ind); font-family:'JetBrains Mono',monospace; margin-bottom:18px; }
+  .hero h1 { font-size:3.4rem; font-weight:900; line-height:1.05; margin-bottom:14px; }
+  .hero h1 span { color:var(--ind); }
+  .hero p { font-size:1rem; color:var(--mu); line-height:1.7; max-width:520px; margin:0 auto 24px; }
+  .hero p strong { color:#cbd5e1; }
+  .cta-row { display:flex; gap:12px; justify-content:center; }
+  .bp { background:var(--ind); color:#fff; border:none; padding:11px 26px; border-radius:10px; font-size:13px; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif; transition:all .2s; }
+  .bp.pulse { box-shadow:0 0 0 5px rgba(99,102,241,.3); transform:scale(1.05); }
+  .bs { background:transparent; border:1px solid var(--bd); color:#94a3b8; padding:11px 26px; border-radius:10px; font-size:13px; cursor:pointer; font-family:'Inter',sans-serif; }
+  .slbl { text-align:center; font-size:10px; text-transform:uppercase; letter-spacing:.15em; color:#334155; font-family:'JetBrains Mono',monospace; margin:28px 0 16px; }
+  .mg { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:24px; }
+  .mc { background:var(--s); border:1px solid var(--bd); border-radius:14px; padding:18px; text-align:center; }
+  .mc h3 { font-size:12px; font-weight:600; color:#fff; margin-top:8px; margin-bottom:5px; }
+  .mc p { font-size:11px; color:var(--mu); line-height:1.5; }
+  .rw { position:relative; display:inline-flex; align-items:center; justify-content:center; }
+  .rv { position:absolute; font-size:1.3rem; font-weight:900; }
+  .stps { display:flex; flex-direction:column; gap:10px; }
+  .stp { display:flex; align-items:flex-start; gap:12px; background:var(--s); border:1px solid var(--bd); border-radius:12px; padding:14px; }
+  .sn { width:34px; height:34px; background:rgba(99,102,241,.1); border:1px solid rgba(99,102,241,.2); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; color:var(--ind); font-family:'JetBrains Mono',monospace; flex-shrink:0; }
+  .stp h3 { font-size:12px; font-weight:600; color:#fff; margin-bottom:2px; }
+  .stp p { font-size:11px; color:var(--mu); line-height:1.5; }
+  .fpp { background:var(--s); border:1px solid rgba(99,102,241,.2); border-radius:12px; padding:18px; margin-top:24px; }
+  .fppl { font-size:10px; font-family:'JetBrains Mono',monospace; letter-spacing:.12em; text-transform:uppercase; color:var(--ind); margin-bottom:8px; }
+  .fpp p { font-size:12px; font-style:italic; color:#a5b4fc; line-height:1.8; }
+
+  /* --- ANALYZE --- */
+  .vt { font-size:20px; font-weight:800; color:#fff; margin-bottom:3px; }
+  .vs { font-size:12px; color:var(--mu); margin-bottom:16px; }
+  textarea { width:100%; height:148px; background:var(--s); border:1px solid var(--bd); border-radius:11px; padding:12px; font-size:11.5px; color:#cbd5e1; font-family:'JetBrains Mono',monospace; resize:none; outline:none; line-height:1.6; transition:border-color .3s; }
+  textarea.focus { border-color:var(--ind); }
+  .br { display:flex; gap:10px; margin-top:10px; }
+  .ab { display:flex; align-items:center; gap:7px; background:var(--ind); color:#fff; border:none; padding:9px 20px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif; transition:all .2s; }
+  .ab.ld { background:#4338ca; opacity:.8; }
+  .db { background:transparent; border:1px solid var(--bd); color:#94a3b8; padding:9px 20px; border-radius:8px; font-size:13px; cursor:pointer; font-family:'Inter',sans-serif; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .sp { width:13px; height:13px; border:2px solid rgba(255,255,255,.25); border-top-color:#fff; border-radius:50%; animation:spin .7s linear infinite; }
+  .res { margin-top:16px; display:flex; flex-direction:column; gap:12px; }
+  .rc { background:var(--s); border:1px solid var(--bd); border-radius:12px; padding:18px; opacity:0; transform:translateY(10px); transition:opacity .5s, transform .5s; }
+  .rc.show { opacity:1; transform:translateY(0); }
+  .cl { font-size:10px; font-family:'JetBrains Mono',monospace; letter-spacing:.14em; text-transform:uppercase; color:var(--mu); margin-bottom:14px; }
+  .sr { display:flex; justify-content:space-around; }
+  .clms { display:flex; flex-direction:column; gap:7px; }
+  .clm { display:flex; align-items:center; gap:9px; border-radius:8px; padding:9px 11px; opacity:0; transform:translateX(-6px); transition:all .4s; }
+  .clm.show { opacity:1; transform:translateX(0); }
+  .clm.H { border:1px solid rgba(239,68,68,.3); background:rgba(239,68,68,.05); }
+  .clm.M { border:1px solid rgba(245,158,11,.3); background:rgba(245,158,11,.05); }
+  .clm.L { border:1px solid rgba(16,185,129,.3); background:rgba(16,185,129,.05); }
+  .cd { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+  .clm.H .cd { background:var(--red); } .clm.M .cd { background:var(--amb); } .clm.L .cd { background:var(--em); }
+  .ct { font-size:11.5px; color:#cbd5e1; flex:1; }
+  .cbg { font-size:9.5px; font-family:'JetBrains Mono',monospace; font-weight:700; padding:2px 6px; border-radius:4px; flex-shrink:0; }
+  .clm.H .cbg { color:var(--red); border:1px solid rgba(239,68,68,.4); }
+  .clm.M .cbg { color:var(--amb); border:1px solid rgba(245,158,11,.4); }
+  .clm.L .cbg { color:var(--em);  border:1px solid rgba(16,185,129,.4); }
+  .stxt { font-size:12.5px; color:#94a3b8; line-height:1.75; }
+  .tag { font-size:9.5px; color:#334155; font-family:'JetBrains Mono',monospace; flex-shrink:0; }
+
+  /* --- PROFILE --- */
+  .sgr { display:grid; grid-template-columns:1fr 1fr 1fr; gap:11px; margin-bottom:13px; }
+  .sb { background:var(--s); border:1px solid var(--bd); border-radius:11px; padding:14px; text-align:center; }
+  .sv { font-size:1.7rem; font-weight:900; color:#fff; }
+  .sl { font-size:9.5px; text-transform:uppercase; letter-spacing:.1em; color:var(--mu); margin-top:3px; font-family:'JetBrains Mono',monospace; }
+  .pc { background:var(--s); border:1px solid var(--bd); border-radius:12px; padding:18px; margin-bottom:12px; opacity:0; transform:translateY(8px); transition:opacity .5s, transform .5s; }
+  .pc.show { opacity:1; transform:translateY(0); }
+  .pc.ind { border-color:rgba(99,102,241,.25); background:rgba(99,102,241,.04); }
+  .tgs { display:flex; flex-wrap:wrap; gap:7px; }
+  .tg { border-radius:999px; padding:4px 11px; font-size:11px; font-family:'JetBrains Mono',monospace; border:1px solid; opacity:0; transform:scale(.88); transition:opacity .3s, transform .3s; }
+  .tg.show { opacity:1; transform:scale(1); }
+  .tg.lg { border-color:rgba(99,102,241,.4); background:rgba(99,102,241,.15); color:#818cf8; font-size:12px; padding:5px 13px; }
+  .tg.md { border-color:rgba(99,102,241,.25); background:rgba(99,102,241,.08); color:#6366f1; }
+  .tg.sm { border-color:var(--bd); background:var(--s); color:#475569; }
+  .bst { font-size:10.5px; border-radius:999px; padding:4px 11px; display:inline-block; }
+  .bst.r { border:1px solid rgba(239,68,68,.3); color:var(--red); }
+  .bst.g { border:1px solid rgba(16,185,129,.3); color:var(--em); }
+  .fpt { font-size:12.5px; font-style:italic; color:#a5b4fc; line-height:1.85; border-left:2px solid rgba(99,102,241,.3); padding-left:13px; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+  .cur { display:inline-block; width:2px; height:13px; background:var(--ind); vertical-align:middle; animation:blink .7s step-end infinite; }
+
+  /* trend */
+  .tsv polyline { stroke-dasharray:600; stroke-dashoffset:600; transition:stroke-dashoffset 1.4s ease; }
+  .tsv circle { opacity:0; transition:opacity .4s .8s; }
+  .tsv.draw polyline { stroke-dashoffset:0; }
+  .tsv.draw circle { opacity:1; }
+
+  /* cursor */
+  #cur { position:fixed; width:16px; height:16px; border-radius:50%; background:rgba(99,102,241,.75); pointer-events:none; z-index:9999; transform:translate(-50%,-50%); box-shadow:0 0 0 3px rgba(99,102,241,.25); transition:left .45s cubic-bezier(.4,0,.2,1), top .45s cubic-bezier(.4,0,.2,1), transform .15s, background .15s; }
+  #cur.ck { transform:translate(-50%,-50%) scale(.65); background:#fff; }
+
+  /* progress */
+  #prog { position:fixed; bottom:0; left:0; height:2px; background:var(--ind); z-index:9999; transition:width .3s linear; }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div style="display:flex;align-items:center;">
+      <div class="lm"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="2.5" fill="white"/><circle cx="7" cy="7" r="5.5" stroke="white" stroke-width="1.2" fill="none" stroke-dasharray="2 2"/></svg></div>
+      <span class="ln">Cognify</span>
+    </div>
+    <nav>
+      <button id="nav-analyze" onclick="void(0)">Analyze</button>
+      <button id="nav-profile" onclick="void(0)">Profile</button>
+    </nav>
+  </header>
+
+  <div class="view">
+    <div class="si" id="si">
+
+      <!-- HOME -->
+      <div class="scr on" id="s-home">
+        <div class="hero">
+          <div class="hbadge">cognitive fitness tracker</div>
+          <h1>Know how well<br/><span>you think.</span></h1>
+          <p>We built tools to track our steps. We built tools to track our sleep.<br/><strong>Nobody built a tool to track cognitive fitness.</strong></p>
+          <div class="cta-row">
+            <button class="bp" id="demo-home">Try Demo</button>
+            <button class="bs">Analyze a Conversation</button>
+          </div>
+        </div>
+        <p class="slbl">What Cognify measures</p>
+        <div class="mg">
+          <div class="mc">
+            <div class="rw"><svg width="76" height="76" style="transform:rotate(-90deg)"><circle cx="38" cy="38" r="29" fill="none" stroke="#1e293b" stroke-width="7"/><circle cx="38" cy="38" r="29" fill="none" stroke="#6366f1" stroke-width="7" stroke-dasharray="126 182" stroke-linecap="round"/></svg><span class="rv" style="color:#6366f1;font-size:1.1rem;">69</span></div>
+            <h3>Critical Thinking</h3><p>How much you challenge and evaluate claims rather than accepting them at face value.</p>
+          </div>
+          <div class="mc">
+            <div class="rw"><svg width="76" height="76" style="transform:rotate(-90deg)"><circle cx="38" cy="38" r="29" fill="none" stroke="#1e293b" stroke-width="7"/><circle cx="38" cy="38" r="29" fill="none" stroke="#10b981" stroke-width="7" stroke-dasharray="133 182" stroke-linecap="round"/></svg><span class="rv" style="color:#10b981;font-size:1.1rem;">73</span></div>
+            <h3>Depth</h3><p>How substantively you explore topics — follow-up questions, nuance-seeking, mechanism-probing.</p>
+          </div>
+          <div class="mc">
+            <div class="rw"><svg width="76" height="76" style="transform:rotate(-90deg)"><circle cx="38" cy="38" r="29" fill="none" stroke="#1e293b" stroke-width="7"/><circle cx="38" cy="38" r="29" fill="none" stroke="#f59e0b" stroke-width="7" stroke-dasharray="155 182" stroke-linecap="round"/></svg><span class="rv" style="color:#f59e0b;font-size:1.1rem;">85</span></div>
+            <h3>Engagement</h3><p>How actively you participate — response quality, contribution, topic coverage.</p>
+          </div>
+        </div>
+        <p class="slbl">How it works</p>
+        <div class="stps">
+          <div class="stp"><div class="sn">01</div><div><h3>Paste a conversation</h3><p>Any conversation with an AI assistant — copy and paste the transcript into Cognify.</p></div></div>
+          <div class="stp"><div class="sn">02</div><div><h3>Get your cognitive scores</h3><p>Cognify analyses your critical thinking, depth, and engagement. Claims are flagged by risk level.</p></div></div>
+          <div class="stp"><div class="sn">03</div><div><h3>Build your profile</h3><p>Every session adds to a longitudinal profile. Blind spots emerge. A cognitive fingerprint is generated over time.</p></div></div>
+        </div>
+        <div class="fpp">
+          <div class="fppl">Sample cognitive fingerprint</div>
+          <p>"You show a recurring pattern of reduced scrutiny around <strong style="color:#fca5a5">health claims</strong>. Skepticism toward <strong style="color:#6ee7b7">science content</strong> is well-calibrated. Critical thinking: <strong style="color:#c7d2fe">improving</strong>."</p>
+        </div>
+      </div>
+
+      <!-- ANALYZE -->
+      <div class="scr" id="s-analyze">
+        <div class="vt">Analyze Conversation</div>
+        <div class="vs">Paste a conversation transcript to see cognitive pattern extraction.</div>
+        <textarea id="ta" placeholder="Paste a conversation transcript here..."></textarea>
+        <div class="br">
+          <button class="ab" id="abtn">Analyze</button>
+          <button class="db">Demo</button>
+        </div>
+        <div class="res" id="res">
+          <div class="rc" id="rc-scores">
+            <div class="cl">Cognitive Scores</div>
+            <div class="sr">
+              <div style="text-align:center">
+                <div class="rw"><svg width="86" height="86" style="transform:rotate(-90deg)"><circle cx="43" cy="43" r="34" fill="none" stroke="#1e293b" stroke-width="8"/><circle id="r-ct" cx="43" cy="43" r="34" fill="none" stroke="#6366f1" stroke-width="8" stroke-dasharray="0 214" stroke-linecap="round" style="transition:stroke-dasharray 1s ease"/></svg><span class="rv" style="color:#6366f1" id="v-ct">0</span></div>
+                <div style="font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--mu);margin-top:3px;">Critical Thinking</div>
+              </div>
+              <div style="text-align:center">
+                <div class="rw"><svg width="86" height="86" style="transform:rotate(-90deg)"><circle cx="43" cy="43" r="34" fill="none" stroke="#1e293b" stroke-width="8"/><circle id="r-dep" cx="43" cy="43" r="34" fill="none" stroke="#10b981" stroke-width="8" stroke-dasharray="0 214" stroke-linecap="round" style="transition:stroke-dasharray 1s ease"/></svg><span class="rv" style="color:#10b981" id="v-dep">0</span></div>
+                <div style="font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--mu);margin-top:3px;">Depth</div>
+              </div>
+              <div style="text-align:center">
+                <div class="rw"><svg width="86" height="86" style="transform:rotate(-90deg)"><circle cx="43" cy="43" r="34" fill="none" stroke="#1e293b" stroke-width="8"/><circle id="r-eng" cx="43" cy="43" r="34" fill="none" stroke="#f59e0b" stroke-width="8" stroke-dasharray="0 214" stroke-linecap="round" style="transition:stroke-dasharray 1s ease"/></svg><span class="rv" style="color:#f59e0b" id="v-eng">0</span></div>
+                <div style="font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--mu);margin-top:3px;">Engagement</div>
+              </div>
+            </div>
+          </div>
+          <div class="rc" id="rc-summary">
+            <div class="cl">Analysis Summary</div>
+            <p class="stxt">User demonstrates strong engagement with AI and productivity topics. A recurring pattern of reduced critical scrutiny appears around health and nutrition claims — accepted at face value without evidence requests. Skepticism toward fringe science is appropriately calibrated, and the session closes with a metacognitive request for evaluation criteria.</p>
+          </div>
+          <div class="rc" id="rc-claims">
+            <div class="cl">Flagged Claims</div>
+            <div class="clms">
+              <div class="clm H" id="c1"><span class="cd"></span><span class="ct">"Vitamin D supplements can cure depression"</span><span class="cbg">HIGH RISK</span><span class="tag">#health</span></div>
+              <div class="clm M" id="c2"><span class="cd"></span><span class="ct">"AI tools are making everyone smarter and more productive"</span><span class="cbg">MEDIUM</span><span class="tag">#AI</span></div>
+              <div class="clm M" id="c3"><span class="cd"></span><span class="ct">"The productivity data speaks for itself"</span><span class="cbg">MEDIUM</span><span class="tag">#reasoning</span></div>
+              <div class="clm L" id="c4"><span class="cd"></span><span class="ct">"5G conspiracy claims lack scientific basis"</span><span class="cbg">VERIFIED</span><span class="tag">#science</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROFILE -->
+      <div class="scr" id="s-profile">
+        <div class="vt">Cognitive Profile</div>
+        <div class="vs">Cumulative patterns across all sessions.</div>
+        <div class="sgr">
+          <div class="sb"><div class="sv">4</div><div class="sl">Sessions</div></div>
+          <div class="sb"><div class="sv" style="color:var(--ind)">55</div><div class="sl">Avg Critical Thinking</div></div>
+          <div class="sb"><div class="sv" style="color:var(--em)">61</div><div class="sl">Avg Depth</div></div>
+        </div>
+        <div class="pc" id="pc-t">
+          <div class="cl">Score Trend</div>
+          <svg class="tsv" id="tsv" viewBox="0 0 460 100" style="width:100%;height:100px;">
+            <line x1="20" x2="440" y1="82" y2="82" stroke="#1e293b" stroke-width="1"/>
+            <line x1="20" x2="440" y1="56" y2="56" stroke="#1e293b" stroke-width="1" stroke-dasharray="4 4"/>
+            <line x1="20" x2="440" y1="30" y2="30" stroke="#1e293b" stroke-width="1" stroke-dasharray="4 4"/>
+            <polyline points="20,76 155,65 295,52 440,30" fill="none" stroke="#6366f1" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <polyline points="20,70 155,62 295,56 440,44" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="20"  cy="76" r="3.5" fill="#6366f1"/>
+            <circle cx="155" cy="65" r="3.5" fill="#6366f1"/>
+            <circle cx="295" cy="52" r="3.5" fill="#6366f1"/>
+            <circle cx="440" cy="30" r="3.5" fill="#6366f1"/>
+            <circle cx="20"  cy="70" r="3.5" fill="#10b981"/>
+            <circle cx="155" cy="62" r="3.5" fill="#10b981"/>
+            <circle cx="295" cy="56" r="3.5" fill="#10b981"/>
+            <circle cx="440" cy="44" r="3.5" fill="#10b981"/>
+            <text x="20"  y="97" font-size="8" fill="#475569" text-anchor="middle">Mar 19</text>
+            <text x="155" y="97" font-size="8" fill="#475569" text-anchor="middle">Mar 26</text>
+            <text x="295" y="97" font-size="8" fill="#475569" text-anchor="middle">Apr 2</text>
+            <text x="440" y="97" font-size="8" fill="#475569" text-anchor="middle">Apr 9</text>
+          </svg>
+          <div style="display:flex;gap:14px;margin-top:6px;">
+            <span style="font-size:10px;color:#64748b;display:flex;align-items:center;gap:4px;"><span style="width:10px;height:2px;background:#6366f1;border-radius:2px;display:inline-block;"></span>Critical Thinking ↑</span>
+            <span style="font-size:10px;color:#64748b;display:flex;align-items:center;gap:4px;"><span style="width:10px;height:2px;background:#10b981;border-radius:2px;display:inline-block;"></span>Depth</span>
+          </div>
+        </div>
+        <div class="pc" id="pc-tp">
+          <div class="cl">Topic Knowledge Map</div>
+          <div class="tgs">
+            <span class="tg lg" id="tg1">AI <span style="opacity:.5;font-size:9px;">4</span></span>
+            <span class="tg lg" id="tg2">health <span style="opacity:.5;font-size:9px;">4</span></span>
+            <span class="tg md" id="tg3">productivity <span style="opacity:.5;font-size:9px;">3</span></span>
+            <span class="tg md" id="tg4">nutrition <span style="opacity:.5;font-size:9px;">2</span></span>
+            <span class="tg sm" id="tg5">skepticism <span style="opacity:.5;font-size:9px;">1</span></span>
+            <span class="tg sm" id="tg6">5G <span style="opacity:.5;font-size:9px;">1</span></span>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+          <div class="pc" id="pc-b" style="border-color:rgba(239,68,68,.2);">
+            <div class="cl" style="color:rgba(239,68,68,.7)">Blind Spots</div>
+            <div style="display:flex;gap:7px;"><span class="bst r">health</span><span class="bst r">nutrition</span></div>
+          </div>
+          <div class="pc" id="pc-s" style="border-color:rgba(16,185,129,.2);">
+            <div class="cl" style="color:rgba(16,185,129,.7)">Strengths</div>
+            <div><span class="bst g">science</span></div>
+          </div>
+        </div>
+        <div class="pc ind" id="pc-fp">
+          <div class="cl" style="color:rgba(99,102,241,.8)">Cognitive Fingerprint</div>
+          <p class="fpt" id="fp"></p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div id="cur"></div>
+<div id="prog" style="width:0%"></div>
+
+<script>
+var TOTAL = 33000;
+var t0 = Date.now();
+setInterval(function() {
+  var p = Math.min(100, (Date.now() - t0) / TOTAL * 100);
+  document.getElementById('prog').style.width = p + '%';
+}, 150);
+
+var cur = document.getElementById('cur');
+function mv(x, y, cb) {
+  cur.style.left = x + 'px';
+  cur.style.top  = y + 'px';
+  if (cb) setTimeout(cb, 450);
+}
+function ck(x, y, cb) {
+  mv(x, y);
+  setTimeout(function() { cur.classList.add('ck'); }, 300);
+  setTimeout(function() { cur.classList.remove('ck'); if (cb) cb(); }, 550);
+}
+mv(640, 360);
+
+function showScr(id) {
+  document.querySelectorAll('.scr').forEach(function(s) { s.classList.remove('on'); });
+  document.getElementById('s-' + id).classList.add('on');
+  document.getElementById('si').scrollTop = 0;
+}
+function navActive(id) {
+  document.querySelectorAll('nav button').forEach(function(b) { b.classList.remove('active','hl'); });
+  var b = document.getElementById('nav-' + id);
+  if (b) b.classList.add('active');
+}
+function navHl(id) {
+  var b = document.getElementById('nav-' + id);
+  if (b) { b.classList.remove('active'); b.classList.add('hl'); }
+}
+
+// typewriter
+var CONVO = "User: I've been reading that AI tools are basically making us all smarter.\n\nAssistant: There are productivity gains documented, though research is nuanced. Some studies show improvements, others raise concerns about skill atrophy.\n\nUser: Plus I read that vitamin D supplements can cure depression - my friend switched and feels way better.\n\nAssistant: The relationship between vitamin D and mood is complex. 'Cure' is a strong claim - depression typically requires professional treatment.\n\nUser: But the AI productivity thing is definitely true. The data speaks for itself.\n\nAssistant: Software productivity data shows acceleration for certain tasks, though variance is high - AI excels at boilerplate but struggles with novel design decisions.\n\nUser: What about the 5G conspiracy stuff - I know that's fake, how do I push back?\n\nAssistant: The 5G claims lack peer-reviewed support and contradict established physics. Point to specific frequency ranges and their interaction with biological tissue.\n\nUser: Got it. What metrics actually matter when evaluating productivity claims?";
+
+function typewriter(el, text, speed, done) {
+  var i = 0;
+  el.classList.add('focus');
+  var iv = setInterval(function() {
+    el.value = text.substring(0, i);
+    i++;
+    if (i > text.length) { clearInterval(iv); if (done) done(); }
+  }, speed);
+}
+
+function animateRing(ringId, valId, target, circ) {
+  var ring = document.getElementById(ringId);
+  var val  = document.getElementById(valId);
+  var filled = circ * target / 100;
+  ring.style.strokeDasharray = filled + ' ' + (circ - filled);
+  var n = 0, step = target / 30;
+  var iv = setInterval(function() {
+    n = Math.min(target, n + step);
+    val.textContent = Math.round(n);
+    if (n >= target) clearInterval(iv);
+  }, 30);
+}
+
+function show(id, delay) {
+  setTimeout(function() {
+    var el = document.getElementById(id);
+    if (el) el.classList.add('show');
+  }, delay || 0);
+}
+
+var FP_TEXT = 'You engage most deeply with AI, productivity, and health topics, where your critical thinking is most active. Across 4 sessions, your critical thinking registers as moderate (avg 55/100) — improving session over session. You show a recurring pattern of reduced scrutiny around "health" and "nutrition" claims. Your skepticism is well-calibrated toward science content. You are asking better, more precise questions with each session.';
+
+function typeFP(el, text, speed) {
+  var i = 0;
+  el.innerHTML = '<span class="cur"></span>';
+  var iv = setInterval(function() {
+    el.innerHTML = text.substring(0, i) + '<span class="cur"></span>';
+    i++;
+    if (i > text.length) {
+      clearInterval(iv);
+      el.innerHTML = text;
+    }
+  }, speed);
+}
+
+function scrollTo(px, duration) {
+  var si = document.getElementById('si');
+  var start = si.scrollTop, diff = px - start, t = 0, step = 16;
+  var iv = setInterval(function() {
+    t += step;
+    var prog = Math.min(1, t / duration);
+    prog = prog < 0.5 ? 2*prog*prog : -1+(4-2*prog)*prog; // ease
+    si.scrollTop = start + diff * prog;
+    if (t >= duration) clearInterval(iv);
+  }, step);
+}
+
+// ── ORCHESTRATION ──────────────────────────────────────────────────────
+
+// Phase 1 (0-2.5s): Home page
+setTimeout(function() { mv(640, 580); }, 500);
+setTimeout(function() { scrollTo(180, 1200); }, 1200);
+
+// Phase 2 (2.5s): cursor moves to Try Demo, pulses, clicks
+setTimeout(function() {
+  scrollTo(0, 400);
+  setTimeout(function() {
+    mv(565, 296);
+    document.getElementById('demo-home').classList.add('pulse');
+  }, 500);
+}, 2500);
+
+setTimeout(function() {
+  ck(565, 296, function() {
+    document.getElementById('demo-home').classList.remove('pulse');
+    navActive('analyze');
+    showScr('analyze');
+  });
+}, 3600);
+
+// Phase 3 (4.2s): textarea focuses, typewriter starts
+setTimeout(function() {
+  mv(640, 340);
+  typewriter(document.getElementById('ta'), CONVO, 18, function() {
+    // typing done ~10.5s: show analyzing state
+    var btn = document.getElementById('abtn');
+    btn.classList.add('ld');
+    btn.innerHTML = '<div class="sp"></div>Analyzing...';
+    mv(200, 450);
+  });
+}, 4200);
+
+// Phase 4 (12.8s): results appear — scores
+setTimeout(function() {
+  var btn = document.getElementById('abtn');
+  btn.classList.remove('ld');
+  btn.innerHTML = 'Analyze';
+  show('rc-scores');
+  setTimeout(function() { animateRing('r-ct', 'v-ct', 69, 214); }, 300);
+  setTimeout(function() { animateRing('r-dep','v-dep', 73, 214); }, 500);
+  setTimeout(function() { animateRing('r-eng','v-eng', 85, 214); }, 700);
+}, 12800);
+
+// Phase 5 (14.2s): summary
+setTimeout(function() { show('rc-summary'); }, 14200);
+
+// Phase 6 (15.2s): claims stagger in
+setTimeout(function() {
+  show('rc-claims');
+  setTimeout(function() { show('c1'); }, 200);
+  setTimeout(function() { show('c2'); }, 500);
+  setTimeout(function() { show('c3'); }, 800);
+  setTimeout(function() { show('c4'); }, 1100);
+}, 15200);
+
+// Phase 7 (17.5s): scroll down through results
+setTimeout(function() { scrollTo(300, 1200); }, 17500);
+setTimeout(function() { scrollTo(520, 1000); }, 19500);
+
+// Phase 8 (21s): nav highlight → click Profile
+setTimeout(function() {
+  mv(1110, 47);
+  navHl('profile');
+}, 21000);
+
+setTimeout(function() {
+  ck(1110, 47, function() {
+    navActive('profile');
+    showScr('profile');
+  });
+}, 22000);
+
+// Phase 9 (23s): profile cards appear
+setTimeout(function() { show('pc-t'); document.getElementById('tsv').classList.add('draw'); }, 23200);
+setTimeout(function() {
+  show('pc-tp');
+  setTimeout(function() { show('tg1'); }, 100);
+  setTimeout(function() { show('tg2'); }, 250);
+  setTimeout(function() { show('tg3'); }, 400);
+  setTimeout(function() { show('tg4'); }, 550);
+  setTimeout(function() { show('tg5'); }, 700);
+  setTimeout(function() { show('tg6'); }, 850);
+}, 25000);
+
+setTimeout(function() {
+  show('pc-b');
+  show('pc-s');
+}, 26500);
+
+// Phase 10 (28s): fingerprint types
+setTimeout(function() {
+  show('pc-fp');
+  setTimeout(function() {
+    typeFP(document.getElementById('fp'), FP_TEXT, 22);
+  }, 400);
+}, 28000);
+
+// scroll to show fingerprint
+setTimeout(function() { scrollTo(600, 1400); }, 29000);
+
+</script>
+</body>
+</html>
