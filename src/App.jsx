@@ -512,7 +512,7 @@ export default function App() {
               <circle cx="7" cy="7" r="5.5" stroke="white" strokeWidth="1.2" fill="none" strokeDasharray="2 2" />
             </svg>
           </div>
-          <span className="font-semibold text-white tracking-tight">CognitionOS</span>
+          <span className="font-semibold text-white tracking-tight">Cognify</span>
           <span className="text-xs text-gray-600 font-mono border border-gray-800 rounded px-1.5 py-0.5">
             mock mode
           </span>
