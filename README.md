@@ -100,7 +100,7 @@ Everything stays on your machine. Cognify stores **labels + scores + signals** i
 ## Roadmap
 
 - ✅ **v1** — on-demand skill + local profile + dashboard
-- 🔜 **Phase 2** — auto-score on session end ([`hooks/`](hooks/cognify-stop-hook.md))
+- ✅ **Phase 2** — auto-score on session end via a `SessionEnd` hook ([`skill/hooks/`](skill/hooks/cognify-autoscore.md))
 - 🔜 **Phase 3** — claude.ai Skills wrapper (reuses `SKILL.md` + `schema.json`)
 - 🔭 **Phase 4** — hosted backend + accounts, and a research arm studying how AI shapes thinking,
   built on Cognify's unique behavioral, longitudinal dataset
@@ -110,8 +110,8 @@ Everything stays on your machine. Cognify stores **labels + scores + signals** i
 ```text
 cognify/
 ├── skill/        # the Claude skill: SKILL.md, store script, schema + science
+│   └── hooks/    # Phase-2 auto-scoring: SessionEnd hook + guide
 ├── app/          # the React dashboard (trends, fingerprint, offloading)
-├── hooks/        # optional auto-scoring (Phase 2)
 └── *.html        # showcase: pitch, slides, demo, explainer
 ```
 
