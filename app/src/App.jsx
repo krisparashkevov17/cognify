@@ -173,6 +173,8 @@ function aggregateProfile(sessions) {
   let totalDepth = 0;
   const trend = [];
   const allClaims = [];
+  let totalOffload = 0;
+  let offloadCount = 0;
 
   for (const s of sessions) {
     for (const t of (s.topics || [])) {
@@ -186,6 +188,10 @@ function aggregateProfile(sessions) {
       depth: s.scores.depth,
     });
     allClaims.push(...(s.claims || []));
+    if (typeof s.offloadingRatio === 'number') {
+      totalOffload += s.offloadingRatio;
+      offloadCount += 1;
+    }
   }
 
   const blindspotTags = allClaims.filter(c => c.risk === 'high').map(c => c.tag);
@@ -199,6 +205,7 @@ function aggregateProfile(sessions) {
     strengths: [...new Set(strengthTags)],
     trend,
     sessionCount: sessions.length,
+    avgOffloadingRatio: offloadCount ? Math.round(totalOffload / offloadCount) : null,
   };
 }
 
@@ -424,6 +431,25 @@ export default function App() {
       }
       return next;
     });
+  }, []);
+
+  const handleImport = useCallback((e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const data = JSON.parse(reader.result);
+        const imported = Array.isArray(data) ? data : data.sessions;
+        if (!Array.isArray(imported)) throw new Error('no sessions array');
+        setSessions(imported);
+        storageSet('sessions', imported);
+        setError(null);
+      } catch {
+        setError('Could not import profile — expected a Cognify profile.json file.');
+      }
+    };
+    reader.readAsText(file);
   }, []);
 
   const handleAnalyze = useCallback(async () => {
@@ -762,6 +788,10 @@ export default function App() {
               <p className="text-sm text-gray-500 mt-1">
                 Cumulative patterns across all sessions.
               </p>
+              <label className="text-xs text-indigo-400 hover:text-indigo-300 cursor-pointer">
+                Import profile.json
+                <input type="file" accept="application/json,.json" onChange={handleImport} className="hidden" />
+              </label>
             </div>
 
             {!profile ? (
@@ -786,6 +816,19 @@ export default function App() {
                     </div>
                   ))}
                 </div>
+
+                {profile.avgOffloadingRatio !== null && (
+                  <div className="mt-6">
+                    <h2 className="text-xs text-amber-400/80 uppercase tracking-widest mb-3">Cognitive Offloading Ratio</h2>
+                    <div className="flex items-center gap-4">
+                      <CircularScore value={profile.avgOffloadingRatio} label="Offloading" color="#f59e0b" />
+                      <p className="text-sm text-gray-400 max-w-xs">
+                        Share of cognitive work delegated to the AI vs. retained and verified. Lower is healthier —
+                        it means you stay in the reasoning loop.
+                      </p>
+                    </div>
+                  </div>
+                )}
 
                 {/* Trend chart */}
                 <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
