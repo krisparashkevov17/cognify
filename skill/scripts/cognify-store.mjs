@@ -1,6 +1,7 @@
-import { readFileSync, writeFileSync, mkdirSync, existsSync, renameSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync, renameSync, realpathSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 export function profileDir() {
   return process.env.COGNIFY_DIR || join(homedir(), '.cognify');
@@ -85,6 +86,18 @@ function main(argv) {
   }
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+// Run main() when invoked as a CLI. Compare *real* paths so invocation through a
+// symlink (e.g. ~/.claude/skills/cognify -> repo) still matches: Node resolves
+// import.meta.url to the real path while argv[1] keeps the symlink path.
+function isCliEntrypoint() {
+  if (!process.argv[1]) return false;
+  try {
+    return realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url));
+  } catch {
+    return import.meta.url === `file://${process.argv[1]}`;
+  }
+}
+
+if (isCliEntrypoint()) {
   main(process.argv.slice(2));
 }

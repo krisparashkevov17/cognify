@@ -1,9 +1,13 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, writeFileSync, existsSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, existsSync, symlinkSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { execFileSync } from 'node:child_process';
 import { appendSession, loadProfile, validateSession } from './cognify-store.mjs';
+
+const STORE = join(dirname(fileURLToPath(import.meta.url)), 'cognify-store.mjs');
 
 function tmpDir() { return mkdtempSync(join(tmpdir(), 'cognify-')); }
 
@@ -62,4 +66,23 @@ test('malformed claim is rejected', () => {
     () => validateSession({ ...sampleSession(), claims: [{ risk: 'high', tag: 't' }] }),
     /claim.text/
   );
+});
+
+// Regression: invoking the CLI through a symlink (how the skill is installed,
+// e.g. ~/.claude/skills/cognify -> repo) must still run main() and persist.
+// Node resolves import.meta.url to the real path while argv[1] keeps the symlink
+// path, so a naive `import.meta.url === file://${argv[1]}` guard silently no-ops.
+test('CLI persists when invoked through a symlink', () => {
+  const dir = tmpDir();
+  const link = join(dir, 'store-link.mjs');
+  symlinkSync(STORE, link);
+  const sessionFile = join(dir, 'session.json');
+  writeFileSync(sessionFile, JSON.stringify(sampleSession('via-link')));
+
+  execFileSync(process.execPath, [link, 'append', sessionFile], {
+    env: { ...process.env, COGNIFY_DIR: dir },
+  });
+
+  assert.ok(existsSync(join(dir, 'profile.json')), 'profile.json written via symlinked CLI');
+  assert.deepEqual(loadProfile(dir).sessions.map(s => s.id), ['via-link']);
 });
