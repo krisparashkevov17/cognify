@@ -52,3 +52,14 @@ test('malformed session is rejected', () => {
     /0-100/
   );
 });
+
+test('malformed claim is rejected', () => {
+  assert.throws(
+    () => validateSession({ ...sampleSession(), claims: [{ text: 'x', risk: 'severe', tag: 't' }] }),
+    /claim.risk/
+  );
+  assert.throws(
+    () => validateSession({ ...sampleSession(), claims: [{ risk: 'high', tag: 't' }] }),
+    /claim.text/
+  );
+});

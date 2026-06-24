@@ -28,6 +28,13 @@ export function validateSession(s) {
   for (const k of ['claims', 'topics', 'engagementSignals']) {
     if (!Array.isArray(s[k])) throw new Error(`session.${k} must be an array`);
   }
+  const RISK = ['high', 'medium', 'low'];
+  for (const c of s.claims) {
+    if (!c || typeof c !== 'object') throw new Error('each claim must be an object');
+    if (typeof c.text !== 'string') throw new Error('claim.text must be a string');
+    if (!RISK.includes(c.risk)) throw new Error('claim.risk must be high|medium|low');
+    if (typeof c.tag !== 'string') throw new Error('claim.tag must be a string');
+  }
   if (typeof s.summary !== 'string') throw new Error('session.summary must be a string');
   return true;
 }

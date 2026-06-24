@@ -131,8 +131,8 @@ function getStore() {
   }
   if (typeof window !== 'undefined' && window.localStorage) {
     try {
-      window.localStorage.setItem('__cognition_test__', '1');
-      window.localStorage.removeItem('__cognition_test__');
+      window.localStorage.setItem('__cognify_test__', '1');
+      window.localStorage.removeItem('__cognify_test__');
       return window.localStorage;
     } catch {
       // fall through to in-memory
@@ -442,6 +442,11 @@ export default function App() {
         const data = JSON.parse(reader.result);
         const imported = Array.isArray(data) ? data : data.sessions;
         if (!Array.isArray(imported)) throw new Error('no sessions array');
+        const valid = imported.every(s =>
+          s && s.scores &&
+          typeof s.scores.criticalThinking === 'number' &&
+          typeof s.scores.depth === 'number');
+        if (!valid) throw new Error('invalid session shape');
         setSessions(imported);
         storageSet('sessions', imported);
         setError(null);
