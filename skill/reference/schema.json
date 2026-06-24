@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Cognify session",
+  "type": "object",
+  "required": ["id", "timestamp", "scores", "claims", "topics", "engagementSignals", "summary"],
+  "properties": {
+    "id": { "type": "string" },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "source": { "type": "string", "enum": ["claude-code", "claude-ai", "manual"] },
+    "conversation": { "type": "string", "description": "Short label, NOT the full transcript (privacy)" },
+    "scores": {
+      "type": "object",
+      "required": ["criticalThinking", "depth", "engagement"],
+      "properties": {
+        "criticalThinking": { "type": "number", "minimum": 0, "maximum": 100 },
+        "depth": { "type": "number", "minimum": 0, "maximum": 100 },
+        "engagement": { "type": "number", "minimum": 0, "maximum": 100 }
+      }
+    },
+    "offloadingRatio": { "type": "number", "minimum": 0, "maximum": 100, "description": "Signature metric; optional for back-compat" },
+    "claims": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["text", "risk", "tag"],
+        "properties": {
+          "text": { "type": "string" },
+          "risk": { "type": "string", "enum": ["high", "medium", "low"] },
+          "tag": { "type": "string" }
+        }
+      }
+    },
+    "topics": { "type": "array", "items": { "type": "string" } },
+    "engagementSignals": { "type": "array", "items": { "type": "string" } },
+    "summary": { "type": "string" },
+    "rubricVersion": { "type": "string" }
+  }
+}
